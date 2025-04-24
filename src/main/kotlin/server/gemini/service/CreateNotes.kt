@@ -37,7 +37,7 @@ class CreateNotes(private val client: HttpClient) {
             println(paragraph.text)
             try {
                 val createVectorUrl = "https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:" +
-                        "embedContent?key=AIzaSyD1dFIesRY8KavV0CWde_wkk-mkXL0fUc8"
+                        "embedContent?key=AIzaSyDUReaeZGCtZaLQlBdIL-x76Lwck7pTNXg"
                 val c = client.post {
                     url(createVectorUrl)
                     setBody(
@@ -128,9 +128,14 @@ class CreateNotes(private val client: HttpClient) {
             val queryVectorsUrl = "https://temporary-m7240u6.svc.aped-4627-b74a.pinecone.io/query"
             val c = client.post {
                 url(queryVectorsUrl)
-                setBody(
-                    queryVectorsRequest
-                )
+                println("QueryResponse vectors ${queryVectorsRequest.vector}")
+                setBody(QueryVectorsRequest(
+                    vector = queryVectorsRequest.vector,
+                    topK = queryVectorsRequest.topK ?: 10,
+                    includeMetadata = queryVectorsRequest.includeMetadata ?: true,
+                    includeValues = queryVectorsRequest.includeValues ?: true,
+                    namespace = queryVectorsRequest.namespace
+                ))
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
                 headers {
                     append("Api-Key", "e88fe59a-4d45-4e71-a287-90a5088db545")
@@ -144,7 +149,7 @@ class CreateNotes(private val client: HttpClient) {
                 println("QueryResponse is inside")
                 return c.body<QueryVectorsResponse>()
             } else {
-                println("QueryResponse is ouside")
+                println("QueryResponse is outside")
                 return QueryVectorsResponse(
                     results = null
                 )
@@ -159,7 +164,7 @@ class CreateNotes(private val client: HttpClient) {
 
     suspend fun askGemini(question: String, content: String): SearchNotesResponse {
         try {
-            val askGeminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBZtDY0o0Q5W8VuDFlwhjzHDwfCOmaQbDU"
+            val askGeminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDUReaeZGCtZaLQlBdIL-x76Lwck7pTNXg"
 
             val createPrompt = "This is the question on a users note that they want to ask" +
                     "The question is: $question. The content of the note is: $content. Now answer the question." +
@@ -184,7 +189,7 @@ class CreateNotes(private val client: HttpClient) {
                     append("Content-Type", "application/json")
                 }
             }
-            println("AskGeminiResponse is ${c}")
+            println("AskGeminiResponse111 is ${content} ")
             if (c.status.isSuccess()) {
                 println("AskGeminiResponse is inside")
                 val response = c.body<AskGeminiResponse>().candidates?.get(0)?.content?.parts?.get(0)?.text

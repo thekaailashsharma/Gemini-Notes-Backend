@@ -307,10 +307,12 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
                     )
                 )
             )
+            println("QueryResponse og vector is $vector")
             val justVectors = vector
                 .mapNotNull { it?.values }
                 .flatten()
 
+            println("QueryResponse og vector is $justVectors")
             val queryNotes = createNotes.queryVectorsRequest(
                 QueryVectorsRequest(
                     vector = justVectors,
@@ -320,9 +322,13 @@ class ApiServiceImpl(private val client: HttpClient) : ApiService {
                 )
             )
 
+            println("AskGeminiResponse111a ais ${queryNotes} ")
+
             val content = queryNotes.matches
                 ?.map { it?.metadata?.genre }
                 .toCombinedString()
+
+            println("AskGeminiResponse111a is ${searchRequest.content} ")
 
             val askGemini = createNotes.askGemini(
                 question = searchRequest.content ?: "",
